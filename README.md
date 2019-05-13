@@ -35,3 +35,43 @@ I cloned the G29EMUPS4 files, stripped the UART commands and implemented the USB
 - Allow other Logitech Wheels for input
 - Add G27/G29 style RPM LED support (need extra hardware on wheel with LEDs)
 
+# Install:
+
+Clone the files, Install Arduino, install the LUFA and USB Host Shield library stated above.
+When compiling, the compile raises an error ('Serial not defined') in the USB Host library.
+This needs an ugly hack that needs a proper solution
+
+Open 'Arduino\libraries\USB_Host_Shield_Library_2.0\settings.h'
+
+change this:
+```c
+#ifndef USB_HOST_SERIAL
+#define USB_HOST_SERIAL Serial
+#endif
+```
+
+with
+
+```c
+#ifndef USB_HOST_SERIAL
+class LUFASerial {
+	private:
+	public:
+	 LUFASerial();
+   void begin(long baud);
+	 void print(const char* StringPtr);
+   void print(long value);
+   void write(int value);
+   void printhex(int value);
+   void println(long value,int type);
+	 void println(const char* StringPtr);
+   void println(long value);
+};
+
+extern LUFASerial Serial;
+
+
+#define USB_HOST_SERIAL Serial
+#endif
+```
+
